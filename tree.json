@@ -1,0 +1,34 @@
+[
+    {
+        "root":"Jaime",
+        "directorys":[
+            {"directorys0Ja":["arch0Ja","arch1Ja"]},
+            {"directorys1Ja":["arch2Ja","arch3Ja"]},
+            {"directorys2Ja":["arch4Ja",
+                {"directory21Ja":[
+                    "arch5Ja",
+                    "arch6Ja"
+                    ]
+                }
+            ]},
+            {"directorys3Ja":["arch7Ja"]},
+            ["arch8Ja"]
+        ]
+    },
+    {
+        "root":"Juan",
+        "directorys":[
+            {"directorys0Ju":["arch0Ju","arch1Ju"]},
+            {"directorys1Ju":["arch2Ju","arch3Ju"]},
+            {"directorys2Ju":["arch4Ju",
+                {"directory21Ju":[
+                    "arch5Ju",
+                    "arch6Ju"
+                    ]
+                }
+            ]},
+            {"directorys3Ju":["arch7Ju"]},
+            ["arch8Ju"]
+        ]
+    }
+]

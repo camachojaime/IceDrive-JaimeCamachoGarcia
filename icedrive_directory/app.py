@@ -6,7 +6,9 @@ from typing import List
 
 import Ice
 
-from .directory import DirectoryService
+from directoryService import DirectoryService
+#from .icedrive_directory import directory
+#from .directory import DirectoryService
 
 
 class DirectoryApp(Ice.Application):
@@ -14,7 +16,8 @@ class DirectoryApp(Ice.Application):
 
     def run(self, args: List[str]) -> int:
         """Execute the code for the AuthentacionApp class."""
-        adapter = self.communicator().createObjectAdapter("DirectoryAdapter")
+        # adapter = self.communicator().createObjectAdapter("DirectoryAdapter")
+        adapter = self.communicator().createObjectAdapter("DirectoryServiceAdapter")
         adapter.activate()
 
         servant = DirectoryService()
@@ -30,5 +33,7 @@ class DirectoryApp(Ice.Application):
 
 def main():
     """Handle the icedrive-authentication program."""
+    print("Holaaaa")
     app = DirectoryApp()
     return app.main(sys.argv)
+
