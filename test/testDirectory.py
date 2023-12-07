@@ -32,7 +32,9 @@ class Client(Ice.Application):
 
                 if directory:
 
-                    option = input("0- getParent\n" +
+                    while True:
+
+                        option = input("0- getParent\n" +
                                    "1- getChilds\n" +
                                    "2- getChild\n" +
                                    "3- createChild\n" +
@@ -45,37 +47,58 @@ class Client(Ice.Application):
                                    "E- Exit\n\n" +
                                    "\tOpcion: ")
                     
-                    if option == str(0):
+                        if option == str(0):
                         
-                        directoryAux = directory.getParent()
-                        if directoryAux:
-                            print(directoryAux.route)
-                            directory = directoryAux
-                        else:
-                            print("Esta en root")
+                            directoryAux = directory.getParent()
+                            if directoryAux:
+                                print(directoryAux.route)
+                                directory = directoryAux
+                            else:
+                                print("Esta en root")
                     
-                    elif option == str(1):
-                        print("\n\t" + str(directory.getChilds()) + "\n")
-                        #print()
+                        elif option == str(1):
+                            print("\n\t" + str(directory.getChilds()) + "\n")
+                            #print()
 
-                    elif option == str(2):
+                        elif option == str(2):
 
-                        print(directory.route)
-                        directoryAux = directory.getChild(input("Acceder a: "))
-                        if directoryAux:
-                            print(type(directory))
-                            print(type(directoryAux.route))
-                            print(directoryAux.route)
-                            directory = directoryAux
-                        else:
-                            print("No se encontro la carpeta")
+                            #print(directory.route)
+                            # directoryAux = directory.getChild(input("Acceder a: "))
+
+                            # dir2 = directory.getChild(input("Acceder a: "))
+                            # print('')
+                            # print(type(dir2))
+                            # print(dir2.route)
+
+                            dir = None
+                            dir = directory.getChild(input("Acceder a:"))
+                            print('')
+
+                            if dir:
+                                # print(type(directory))
+                                # print(type(directoryAux.route))
+                                # print(directoryAux.route)
+                                directory = dir
+                            else:
+                                print("No se encontro la carpeta")
+
+                        elif option == str(3):
+
+                            dir = None
+                            dir = directory.createChild(input("\nIndique el nombre de la nueva carpeta: "))
+                            print('')
+                            
+                            if dir:
+                                directory = dir
+                            else:
+                                print('Carpeta ya existente')
 
 
-                    elif option == str(6):
-                        print(directory.getBlobId("Hola"))
+                        elif option == str(6):
+                            print(directory.getBlobId("Hola"))
 
-                    elif option == 'E':
-                        break
+                        elif option == 'E':
+                            break
 
                 else:
 

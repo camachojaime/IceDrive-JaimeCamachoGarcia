@@ -1,6 +1,6 @@
 """Module for servants implementations."""
 import sys
-import json
+#import json
 import os
 
 from typing import List
@@ -16,8 +16,6 @@ TXRED = '\033[91m'              # Error color (red)
 TXYELLOW = '\033[93m'           # Yellow color
 TXORANGE = '\033[38;5;208m'     # Orange color
 TXENDC = '\033[0m'              # Standar color
-
-
 
 
 # def isRoot(str):
@@ -59,7 +57,7 @@ class Directory(IceDrive.Directory):
         """Return the proxy to the parent directory, if it exists. None in other case."""
         
         if len(self.route.split('/')) == 1:
-            return False
+            return False                        # Poner otra condicion para poner el return fuera
         else:
             v = self.route.split('/')
             v.pop(len(v)-1)
@@ -71,36 +69,55 @@ class Directory(IceDrive.Directory):
             return IceDrive.DirectoryPrx.uncheckedCast(proxy)
 
 
-
-
     def getChilds(self, current: Ice.Current = None) -> List[str]:
         """Return a list of names of the directories contained in the directory."""
 
         route = "usersDirectorys/" + self.route
-        directorys = os.path.join(os.getcwd(), route)
+        directorys = os.path.join(os.getcwd(), route)                                                               # Add files y extension
         return [nombre for nombre in os.listdir(directorys) if os.path.isdir(os.path.join(directorys, nombre))]
 
 
     def getChild(self, name: str, current: Ice.Current = None) -> IceDrive.DirectoryPrx:
         """Return the proxy to one specific directory inside the current one."""
 
-        print(os.getcwd())
+        # print(os.getcwd())
 
         #self.route = os.getcwd() + "/usersDirectorys/" + self.route
-        self.route = self.route + name
-        print(self.route) 
-        
-        proxy = current.adapter.addWithUUID(self)
-        return IceDrive.DirectoryPrx.uncheckedCast(proxy)
+
+        if name in self.getChilds():
+            self.route = self.route + name + "/"
+            print(self.route)                                   # DELETE
+
+            proxy = current.adapter.addWithUUID(self)
+            return IceDrive.DirectoryPrx.uncheckedCast(proxy)
+
+            # Dir2 = Directory()
+            # Dir2.route = self.route
+            # proxy = current.adapter.addWithUUID(Dir2)
+            # return IceDrive.DirectoryPrx.uncheckedCast(proxy)
+
+        return False
 
         # usersDirectorys = os.path.join(os.getcwd(), self.route)
         # users = [nombre for nombre in os.listdir(usersDirectorys) if os.path.isdir(os.path.join(usersDirectorys, nombre))]
 
 
-    def createChild(
-        self, name: str, current: Ice.Current = None
-    ) -> IceDrive.DirectoryPrx:
+    def createChild(self, name: str, current: Ice.Current = None) -> IceDrive.DirectoryPrx:
         """Create a new child directory and returns its proxy."""
+        
+        if name not in self.getChilds():
+            route = os.getcwd() + "/usersDirectorys/" + self.route + name
+            print(route)
+
+            os.makedirs(route)
+            print("Hecho")
+
+            proxy = current.adapter.addWithUUID(self)
+            return IceDrive.DirectoryPrx.uncheckedCast(proxy)
+
+        return False
+
+
 
     def removeChild(self, name: str, current: Ice.Current = None) -> None:
         """Remove the child directory with the given name if exists."""
@@ -112,9 +129,7 @@ class Directory(IceDrive.Directory):
         """Return the "blob id" for a given file name inside the directory."""
         return "Hola mundo 2.0"
 
-    def linkFile(
-        self, filename: str, blob_id: str, current: Ice.Current = None
-    ) -> None:
+    def linkFile(self, filename: str, blob_id: str, current: Ice.Current = None) -> None:
         """Link a file to a given blob_id."""
 
     def unlinkFile(self, filename: str, current: Ice.Current = None) -> None:
