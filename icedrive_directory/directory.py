@@ -18,66 +18,54 @@ TXORANGE = '\033[38;5;208m'     # Orange color
 TXENDC = '\033[0m'              # Standar color
 
 
-# def isRoot(str):
-#     # Try
-#     # with open("tree.json") as file:
-#     #     tree = json.load(file)
-
-#     # if tree:
-#     #     for i in tree:
-#     #         if i["root"] == str:
-#     #             return True
-
-#     # return False
-
-
-#     usersDirectorys = os.path.join(os.getcwd(), 'usersDirectorys')
-#     users = [nombre for nombre in os.listdir(usersDirectorys) if os.path.isdir(os.path.join(usersDirectorys, nombre))]
-
-#     if str in users:
-#         return True
-
-#     return False
-        
-
-
-
-
-
-
-
 class Directory(IceDrive.Directory):
     """Implementation of the IceDrive.Directory interface."""
 
     def __init__(self):
         self.route = ""
+        self.childs = []
+        self.files = []
         #self.isRoot = False
 
-    def getParent(self, current: Ice.Current = None) -> IceDrive.DirectoryPrx:
+
+    def getParent(self, current: Ice.Current = None) -> IceDrive.DirectoryPrx:                      # DO
         """Return the proxy to the parent directory, if it exists. None in other case."""
         
-        if len(self.route.split('/')) == 1:
-            return False                        # Poner otra condicion para poner el return fuera
-        else:
-            v = self.route.split('/')
-            v.pop(len(v)-1)
-            self.route = '/'.join(v)
+        v = self.route.split('/')
+        # print('ROUTE: ' + self.route)
+        # print(v)
 
-            print(self.route)
+        if len(v) > 1:
+            # v.pop(len(v)-1)
+            # v.pop(len(v)-1)
+
+            v.pop()
+
+            self.route = '/'.join(v)
+            # print("After: " + self.route)
+            # print(self.route)
 
             proxy = current.adapter.addWithUUID(self)
             return IceDrive.DirectoryPrx.uncheckedCast(proxy)
 
+        return None
 
-    def getChilds(self, current: Ice.Current = None) -> List[str]:
+
+    def getChilds(self, current: Ice.Current = None) -> List[str]:                                      # DO
         """Return a list of names of the directories contained in the directory."""
 
-        route = "usersDirectorys/" + self.route
-        directorys = os.path.join(os.getcwd(), route)                                                               # Add files y extension
+        directorys = os.path.join(os.getcwd(), "usersDirectorys", self.route)
+        
+        # self.childs = []
+        # for dir in os.listdir(directorys):
+        #     if os.path.isdir(os.path.join(directorys, dir)):
+        #         self.childs.append(dir)
+
         return [nombre for nombre in os.listdir(directorys) if os.path.isdir(os.path.join(directorys, nombre))]
+        # return self.childs
 
 
-    def getChild(self, name: str, current: Ice.Current = None) -> IceDrive.DirectoryPrx:
+    def getChild(self, name: str, current: Ice.Current = None) -> IceDrive.DirectoryPrx:                # DO
         """Return the proxy to one specific directory inside the current one."""
 
         # print(os.getcwd())
@@ -85,7 +73,8 @@ class Directory(IceDrive.Directory):
         #self.route = os.getcwd() + "/usersDirectorys/" + self.route
 
         if name in self.getChilds():
-            self.route = self.route + name + "/"
+            #self.route = self.route + name + "/"
+            self.route = os.path.join(self.route, name)
             print(self.route)                                   # DELETE
 
             proxy = current.adapter.addWithUUID(self)
@@ -96,7 +85,8 @@ class Directory(IceDrive.Directory):
             # proxy = current.adapter.addWithUUID(Dir2)
             # return IceDrive.DirectoryPrx.uncheckedCast(proxy)
 
-        return False
+        # return False
+        return None
 
         # usersDirectorys = os.path.join(os.getcwd(), self.route)
         # users = [nombre for nombre in os.listdir(usersDirectorys) if os.path.isdir(os.path.join(usersDirectorys, nombre))]
@@ -104,33 +94,50 @@ class Directory(IceDrive.Directory):
 
     def createChild(self, name: str, current: Ice.Current = None) -> IceDrive.DirectoryPrx:
         """Create a new child directory and returns its proxy."""
-        
-        if name not in self.getChilds():
-            route = os.getcwd() + "/usersDirectorys/" + self.route + name
-            print(route)
+
+        if name not in self.getChilds():                                            # Si no se llama aqui a getChilds, hay que llamarlo luego para actualizar la lista
+            # route = os.getcwd() + "/usersDirectorys/" + self.route + name
+            route = os.path.join(os.getcwd(), "usersDirectorys", self.route, name)
+            # print(route)
 
             os.makedirs(route)
-            print("Hecho")
+            # print("Hecho")
 
             proxy = current.adapter.addWithUUID(self)
             return IceDrive.DirectoryPrx.uncheckedCast(proxy)
 
-        return False
-
+        # return False
+        return None
 
 
     def removeChild(self, name: str, current: Ice.Current = None) -> None:
         """Remove the child directory with the given name if exists."""
 
+        if name in self.getChilds():
+            route = os.getcwd() + "/usersDirectorys/" + self.route + name
+            os.rmdir(route)
+
+        #     proxy = current.adapter.addWithUUID(self)
+        #     return IceDrive.DirectoryPrx.uncheckedCast(proxy)
+
+        # return None
+
+
+        # os.rmdir()
+
+
     def getFiles(self, current: Ice.Current = None) -> List[str]:
         """Return a list of the files linked inside the current directory."""
+
 
     def getBlobId(self, filename: str, current: Ice.Current = None) -> str:             # Metodo prueba
         """Return the "blob id" for a given file name inside the directory."""
         return "Hola mundo 2.0"
 
+
     def linkFile(self, filename: str, blob_id: str, current: Ice.Current = None) -> None:
         """Link a file to a given blob_id."""
+
 
     def unlinkFile(self, filename: str, current: Ice.Current = None) -> None:
         """Unlink (remove) a filename from the current directory."""
@@ -139,8 +146,8 @@ class Directory(IceDrive.Directory):
 class DirectoryService(IceDrive.DirectoryService):
     """Implementation of the IceDrive.Directory interface."""
 
-    def __init__(self):
-        self.broker = None
+    # def __init__(self):
+    #     self.broker = None
     
 
     def getRoot(self, user: str, current: Ice.Current = None) -> IceDrive.DirectoryPrx:
@@ -148,33 +155,34 @@ class DirectoryService(IceDrive.DirectoryService):
 
         print(TXYELLOW + "Buscando usuario..." + TXENDC) 
 
-
         usersDirectorys = os.path.join(os.getcwd(), 'usersDirectorys')
-        # print("pasa")
-        users = [nombre for nombre in os.listdir(usersDirectorys) if os.path.isdir(os.path.join(usersDirectorys, nombre))]
-        # print("sjssjjs")
-        # print(len(users))
-        # print(users)
-        # print(type(users))
-        # print(user)
-        # print(user == 'Jaime')
-        # print(user in users)
-        if user in users:
 
+        directory = Directory()
+        directory.route += user
+
+        if user in os.listdir(usersDirectorys) and os.path.isdir(os.path.join(usersDirectorys, user)):
             print(TXPURPLE + "Usuario encontrado!!!" + TXENDC)                  
 
-            directory = Directory()         # Servant
-            directory.route += user + "/"
-            print(directory.route)
+            # directory = Directory()         # Servant
+            # # directory.route += user + "/"
+            # directory.route += user
+            # print(directory.route)
 
             proxy = current.adapter.addWithUUID(directory)
             return IceDrive.DirectoryPrx.uncheckedCast(proxy)
+        
+        os.mkdir(os.path.join(usersDirectorys, user))
+        print(TXPURPLE + "Usuario creado!!!" + TXENDC)  
 
-        print(TXRED + "Usuario no encontrado!!!" + TXENDC)                  
-        #return False
-            
-        # else:
-        #     print(TXRED + "Usuario no encontrado" + TXENDC)
+        # directory = Directory()
+        # directory.route += user
+        # print(directory.route)
+
+        proxy = current.adapter.addWithUUID(directory)
+        return IceDrive.DirectoryPrx.uncheckedCast(proxy)
+
+        # print(TXRED + "Usuario no encontrado!!!" + TXENDC)
+        # return None
 
 
 class Server(Ice.Application):
@@ -184,54 +192,23 @@ class Server(Ice.Application):
 
         print(TXPURPLE + "[DIRECTORY] Launching directory..." + TXENDC)
 
-        # root = input("Introduzca usuario: ")
-
         broker = self.communicator()
         servant = DirectoryService()
-        # servant.route = root
-        # servant.route = input("Introduzca usuario: ")
 
         adapter = broker.createObjectAdapter("DirectoryServiceAdapter")
         proxy = adapter.add(servant, broker.stringToIdentity("DirectoryService1"))
 
-        # print(str(proxy) + "\n\n" +
-        #       "Introduzca el anterior proxy en otra terminal de comandos\n\n" +
-        #       "\t$ python3 Client.py 'proxy'")
-        # sys.stdout.flush()
         print(proxy)
 
         adapter.activate()
         self.shutdownOnInterrupt()
         broker.waitForShutdown()
 
-        # adapter = self.communicator().createObjectAdapter("DirectoryAdapter")
-        # adapter.activate()
-
-        # broker2 = self
-        # broker3 = self.communicator()
-        #servant = Directory()
-
-        # adapter = self.communicator().createObjectAdapter("DirectoryAdapter")
-        # # proxy = adapter.add(servant, broker.stringToIdentity("directory1"))
-        # proxy = adapter.add(self, broker.stringToIdentity("directory1"))
-
-
-        # servant = DirectoryService()
-        # servant_proxy = adapter.addWithUUID(servant)
-
-        # servant = DirectoryService()
-        servant_proxy = adapter.addWithUUID(self)
-
-
-        # print(servant_proxy)
+        # servant_proxy = adapter.addWithUUID(self)
         sys.stdout.flush()
 
-        # adapter.activate()
         # self.shutdownOnInterrupt()
-        # broker.waitForShutdown()
-
-        self.shutdownOnInterrupt()
-        self.communicator().waitForShutdown()
+        # self.communicator().waitForShutdown()
 
 
 server = Server()

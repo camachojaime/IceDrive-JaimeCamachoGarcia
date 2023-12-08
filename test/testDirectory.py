@@ -42,7 +42,7 @@ class Client(Ice.Application):
                                    "5- getFiles\n" +
                                    "6- getBlobId\n" +
                                    "7- linkFile\n" +
-                                   "8- unlinkFile" +
+                                   "8- unlinkFile\n" +
                                    "9- Cambiar usuario\n" +
                                    "E- Exit\n\n" +
                                    "\tOpcion: ")
@@ -51,7 +51,7 @@ class Client(Ice.Application):
                         
                             directoryAux = directory.getParent()
                             if directoryAux:
-                                print(directoryAux.route)
+                                # print(directoryAux.route)
                                 directory = directoryAux
                             else:
                                 print("Esta en root")
@@ -85,13 +85,26 @@ class Client(Ice.Application):
                         elif option == str(3):
 
                             dir = None
-                            dir = directory.createChild(input("\nIndique el nombre de la nueva carpeta: "))
+                            dir = directory.createChild(input("\nNombre de la nueva carpeta: "))
                             print('')
                             
                             if dir:
                                 directory = dir
                             else:
                                 print('Carpeta ya existente')
+                        
+                        elif option == str(4):
+                        
+                            dir = None
+                            dir = directory.removeChild(input("\nNombre de la carpeta: "))
+                            print('')
+
+                            if dir:
+                                directory = dir
+
+                            else:
+                                print('La carpeta no existe')
+
 
 
                         elif option == str(6):
@@ -101,8 +114,8 @@ class Client(Ice.Application):
                             break
 
                 else:
-
                     print("USUARIO NO ENCONTRADO")
+                    break
                 
 
 
