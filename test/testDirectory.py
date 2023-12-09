@@ -56,7 +56,7 @@ class Client(Ice.Application):
                         elif option == str(2):
 
                             dir = None
-                            dir = directory.getChild(input("\n\tAcceder a:"))
+                            dir = directory.getChild(input("\n\tAcceder a: "))
                             print('')
 
                             if dir:
@@ -67,7 +67,7 @@ class Client(Ice.Application):
                         elif option == str(3):
 
                             dir = None
-                            dir = directory.createChild(input("\nNombre de la nueva carpeta: "))
+                            dir = directory.createChild(input("\n\tNombre de la nueva carpeta: "))
                             print('')
                             
                             if dir:
@@ -78,21 +78,21 @@ class Client(Ice.Application):
                         elif option == str(4):
                         
                             dir = None
-                            dir = directory.removeChild(input("\nNombre de la carpeta: "))
+                            dir = directory.removeChild(input("\n\tNombre de la carpeta: "))
                             print('')
 
-                            if dir:
-                                directory = dir
+                            # if dir:
+                            #     directory = dir
 
-                            else:
-                                print('La carpeta no existe')
+                            # else:
+                            #     print('La carpeta no existe')
                         
                         elif option == str(5):
 
                             files = directory.getFiles()
-                            print()
-                            print(files)
-                            print()
+                            #print()
+                            print("\n\t" + str(files) + "\n")
+                            #print()
 
                         elif option == str(6):
                             print(directory.getBlobId(input("\n\tNombre archivo (con extension): ")))

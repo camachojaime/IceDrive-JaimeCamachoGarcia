@@ -67,13 +67,11 @@ class Directory(IceDrive.Directory):
         # return self.childs
 
 
-    def getChild(self, name: str, current: Ice.Current = None) -> IceDrive.DirectoryPrx:                # DO
+    def getChild(self, name: str, current: Ice.Current = None) -> IceDrive.DirectoryPrx:
         """Return the proxy to one specific directory inside the current one."""
 
         # print(os.getcwd())
-
         #self.route = os.getcwd() + "/usersDirectorys/" + self.route
-
         if name in self.getChilds():
             #self.route = self.route + name + "/"
             self.route = os.path.join(self.route, name)
@@ -115,8 +113,10 @@ class Directory(IceDrive.Directory):
         """Remove the child directory with the given name if exists."""
 
         if name in self.getChilds():
-            route = os.getcwd() + "/usersDirectorys/" + self.route + name
-            os.rmdir(route)
+            # route = os.getcwd() + "/usersDirectorys/" + self.route + name
+            # os.rmdir(route)
+
+            os.rmdir(os.path.join(os.getcwd(), "usersDirectorys", self.route, name))
 
         #     proxy = current.adapter.addWithUUID(self)
         #     return IceDrive.DirectoryPrx.uncheckedCast(proxy)
