@@ -27,33 +27,26 @@ class Directory(IceDrive.Directory):
         self.route = ""
         self.childs = []
         self.files = []
-        #self.isRoot = False
 
 
-    def getParent(self, current: Ice.Current = None) -> IceDrive.DirectoryPrx:                      # DO
+    def getParent(self, current: Ice.Current = None) -> IceDrive.DirectoryPrx:
         """Return the proxy to the parent directory, if it exists. None in other case."""
         
         v = self.route.split('/')
-        # print('ROUTE: ' + self.route)
-        # print(v)
 
         if len(v) > 1:
-            # v.pop(len(v)-1)
-            # v.pop(len(v)-1)
-
             v.pop()
 
             self.route = '/'.join(v)
-            # print("After: " + self.route)
-            # print(self.route)
 
             proxy = current.adapter.addWithUUID(self)
             return IceDrive.DirectoryPrx.uncheckedCast(proxy)
+        
+        raise IceDrive.RootHasNoParent("Esta en root.")
+        # return None
 
-        return None
 
-
-    def getChilds(self, current: Ice.Current = None) -> List[str]:                                      # DO
+    def getChilds(self, current: Ice.Current = None) -> List[str]:
         """Return a list of names of the directories contained in the directory."""
 
         directorys = os.path.join(os.getcwd(), "usersDirectorys", self.route)
@@ -64,75 +57,48 @@ class Directory(IceDrive.Directory):
         #         self.childs.append(dir)
 
         return [nombre for nombre in os.listdir(directorys) if os.path.isdir(os.path.join(directorys, nombre))]
-        # return self.childs
 
 
     def getChild(self, name: str, current: Ice.Current = None) -> IceDrive.DirectoryPrx:
         """Return the proxy to one specific directory inside the current one."""
 
-        # print(os.getcwd())
-        #self.route = os.getcwd() + "/usersDirectorys/" + self.route
         if name in self.getChilds():
-            #self.route = self.route + name + "/"
+        #try:
             self.route = os.path.join(self.route, name)
 
             proxy = current.adapter.addWithUUID(self)
             return IceDrive.DirectoryPrx.uncheckedCast(proxy)
-
-            # Dir2 = Directory()
-            # Dir2.route = self.route
-            # proxy = current.adapter.addWithUUID(Dir2)
-            # return IceDrive.DirectoryPrx.uncheckedCast(proxy)
-
-        # return False
-        return None
-
-        # usersDirectorys = os.path.join(os.getcwd(), self.route)
-        # users = [nombre for nombre in os.listdir(usersDirectorys) if os.path.isdir(os.path.join(usersDirectorys, nombre))]
+        
+        #except:
+        raise IceDrive.ChildNotExits("El directorio no existe.")
+        # return None
 
 
     def createChild(self, name: str, current: Ice.Current = None) -> IceDrive.DirectoryPrx:
         """Create a new child directory and returns its proxy."""
 
         if name not in self.getChilds():                                            # Si no se llama aqui a getChilds, hay que llamarlo luego para actualizar la lista
-            # route = os.getcwd() + "/usersDirectorys/" + self.route + name
             route = os.path.join(os.getcwd(), "usersDirectorys", self.route, name)
-            # print(route)
-
             os.makedirs(route)
-            # print("Hecho")
 
             proxy = current.adapter.addWithUUID(self)
             return IceDrive.DirectoryPrx.uncheckedCast(proxy)
 
-        # return False
-        return None
+        raise IceDrive.ChildAlreadyExists("El directorio ya existe.")
+        # return None
 
 
     def removeChild(self, name: str, current: Ice.Current = None) -> None:
         """Remove the child directory with the given name if exists."""
 
         if name in self.getChilds():
-            # route = os.getcwd() + "/usersDirectorys/" + self.route + name
-            # os.rmdir(route)
-
             os.rmdir(os.path.join(os.getcwd(), "usersDirectorys", self.route, name))
-
-        #     proxy = current.adapter.addWithUUID(self)
-        #     return IceDrive.DirectoryPrx.uncheckedCast(proxy)
-
-        # return None
-
-
-        # os.rmdir()
 
 
     def getFiles(self, current: Ice.Current = None) -> List[str]:
         """Return a list of the files linked inside the current directory."""
 
         directorys = os.path.join(os.getcwd(), "usersDirectorys", self.route)
-
-        # print(os.path.isdir(os.path.join(os.getcwd(), "usersDirectorys", "Jaime", "archJaime.txt")))
         
         files = []
         for f in os.listdir(directorys):
@@ -141,44 +107,35 @@ class Directory(IceDrive.Directory):
         
         return files
 
-        # for dir in os.listdir(directorys):
-        #     if os.path.isdir(os.path.join(directorys, dir)):
-        #         self.childs.append(dir)
-
-        # return [nombre for nombre in os.listdir(directorys) if os.path.isdir(os.path.join(directorys, nombre))]
-
 
     def getBlobId(self, filename: str, current: Ice.Current = None) -> str:
         """Return the "blob id" for a given file name inside the directory."""
-        
-        #   if user in os.listdir(usersDirectorys) and os.path.isdir(os.path.join(usersDirectorys, user)):
-        
+
         if filename in self.getFiles():
             with open(os.path.join(os.getcwd(), "usersDirectorys", self.route, filename), 'r') as file:
                 return(file.read())
-            #blob = file.read()
         
-        return ""
-        #return blob
+        raise IceDrive.FileNotFound("No se encontro el archivo.")
+        # return ""
 
 
     def linkFile(self, filename: str, blob_id: str, current: Ice.Current = None) -> None:
         """Link a file to a given blob_id."""
 
         if filename not in self.getFiles():
-            #with open(os.path.join(os.getcwd(), "usersDirectorys", self.route, filename+".txt"), 'w') as file:
             with open(os.path.join(os.getcwd(), "usersDirectorys", self.route, filename), 'w') as file:
                 file.write(blob_id)
+        
+        raise IceDrive.FileAlreadyExists("El archivo ya existe.")
 
 
     def unlinkFile(self, filename: str, current: Ice.Current = None) -> None:
         """Unlink (remove) a filename from the current directory."""
 
-        #print(filename in self.getFiles())
         if filename in self.getFiles():
-            #print("ENTRA")
-            #os.remove(os.path.join(os.getcwd(), "usersDirectorys", self.route, filename+".txt"))
             os.remove(os.path.join(os.getcwd(), "usersDirectorys", self.route, filename))
+        
+        raise IceDrive.FileNotFound("No se encontro el archivo.")
 
 
 class DirectoryService(IceDrive.DirectoryService):
@@ -198,26 +155,14 @@ class DirectoryService(IceDrive.DirectoryService):
         if user in os.listdir(usersDirectorys) and os.path.isdir(os.path.join(usersDirectorys, user)):
             print(TXPURPLE + "Usuario encontrado!!!" + TXENDC)                  
 
-            # directory = Directory()         # Servant
-            # # directory.route += user + "/"
-            # directory.route += user
-            # print(directory.route)
-
             proxy = current.adapter.addWithUUID(directory)
             return IceDrive.DirectoryPrx.uncheckedCast(proxy)
         
         os.mkdir(os.path.join(usersDirectorys, user))
         print(TXPURPLE + "Usuario creado!!!" + TXENDC)  
 
-        # directory = Directory()
-        # directory.route += user
-        # print(directory.route)
-
         proxy = current.adapter.addWithUUID(directory)
         return IceDrive.DirectoryPrx.uncheckedCast(proxy)
-
-        # print(TXRED + "Usuario no encontrado!!!" + TXENDC)
-        # return None
 
 
 class Server(Ice.Application):
@@ -239,11 +184,7 @@ class Server(Ice.Application):
         self.shutdownOnInterrupt()
         broker.waitForShutdown()
 
-        # servant_proxy = adapter.addWithUUID(self)
         sys.stdout.flush()
-
-        # self.shutdownOnInterrupt()
-        # self.communicator().waitForShutdown()
 
 
 server = Server()
