@@ -1,0 +1,4 @@
+Hola, esto es el archivo:
+    archJaime.txt
+    
+0123456789

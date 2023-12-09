@@ -17,6 +17,8 @@ TXYELLOW = '\033[93m'           # Yellow color
 TXORANGE = '\033[38;5;208m'     # Orange color
 TXENDC = '\033[0m'              # Standar color
 
+driveRoute = None   # Poner en fichero de configuracion
+
 
 class Directory(IceDrive.Directory):
     """Implementation of the IceDrive.Directory interface."""
@@ -75,7 +77,6 @@ class Directory(IceDrive.Directory):
         if name in self.getChilds():
             #self.route = self.route + name + "/"
             self.route = os.path.join(self.route, name)
-            print(self.route)                                   # DELETE
 
             proxy = current.adapter.addWithUUID(self)
             return IceDrive.DirectoryPrx.uncheckedCast(proxy)
@@ -129,26 +130,60 @@ class Directory(IceDrive.Directory):
     def getFiles(self, current: Ice.Current = None) -> List[str]:
         """Return a list of the files linked inside the current directory."""
 
+        directorys = os.path.join(os.getcwd(), "usersDirectorys", self.route)
 
-    def getBlobId(self, filename: str, current: Ice.Current = None) -> str:             # Metodo prueba
+        # print(os.path.isdir(os.path.join(os.getcwd(), "usersDirectorys", "Jaime", "archJaime.txt")))
+        
+        files = []
+        for f in os.listdir(directorys):
+            if not os.path.isdir(os.path.join(directorys, f)):
+                files.append(f)
+        
+        return files
+
+        # for dir in os.listdir(directorys):
+        #     if os.path.isdir(os.path.join(directorys, dir)):
+        #         self.childs.append(dir)
+
+        # return [nombre for nombre in os.listdir(directorys) if os.path.isdir(os.path.join(directorys, nombre))]
+
+
+    def getBlobId(self, filename: str, current: Ice.Current = None) -> str:
         """Return the "blob id" for a given file name inside the directory."""
-        return "Hola mundo 2.0"
+        
+        #   if user in os.listdir(usersDirectorys) and os.path.isdir(os.path.join(usersDirectorys, user)):
+        
+        if filename in self.getFiles():
+            with open(os.path.join(os.getcwd(), "usersDirectorys", self.route, filename), 'r') as file:
+                return(file.read())
+            #blob = file.read()
+        
+        return ""
+        #return blob
 
 
     def linkFile(self, filename: str, blob_id: str, current: Ice.Current = None) -> None:
         """Link a file to a given blob_id."""
 
+        if filename not in self.getFiles():
+            #with open(os.path.join(os.getcwd(), "usersDirectorys", self.route, filename+".txt"), 'w') as file:
+            with open(os.path.join(os.getcwd(), "usersDirectorys", self.route, filename), 'w') as file:
+                file.write(blob_id)
+
 
     def unlinkFile(self, filename: str, current: Ice.Current = None) -> None:
         """Unlink (remove) a filename from the current directory."""
+
+        #print(filename in self.getFiles())
+        if filename in self.getFiles():
+            #print("ENTRA")
+            #os.remove(os.path.join(os.getcwd(), "usersDirectorys", self.route, filename+".txt"))
+            os.remove(os.path.join(os.getcwd(), "usersDirectorys", self.route, filename))
 
 
 class DirectoryService(IceDrive.DirectoryService):
     """Implementation of the IceDrive.Directory interface."""
 
-    # def __init__(self):
-    #     self.broker = None
-    
 
     def getRoot(self, user: str, current: Ice.Current = None) -> IceDrive.DirectoryPrx:
         """Return the proxy for the root directory of the given user."""
