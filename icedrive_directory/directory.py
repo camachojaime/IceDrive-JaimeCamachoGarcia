@@ -1,15 +1,12 @@
 """Module for servants implementations."""
-import sys
-#import json
+#import sys
+
 import os
-
 from typing import List
-
 import Ice
-#Ice.loadSlice('icedrive.ice')
-Ice.loadSlice('icedrive_directory/icedrive.ice')
-import IceDrive
 #Ice.loadSlice('icedrive_directory/icedrive.ice')
+import IceDrive
+
 
 TXPURPLE = '\033[95m'           # Success color (purple)
 TXRED = '\033[91m'              # Error color (red)
@@ -17,7 +14,7 @@ TXYELLOW = '\033[93m'           # Yellow color
 TXORANGE = '\033[38;5;208m'     # Orange color
 TXENDC = '\033[0m'              # Standar color
 
-driveRoute = None   # Poner en fichero de configuracion
+# driveRoute = os.path.join(os.getcwd(), "usersDirectorys")   # Poner en fichero de configuracion
 
 
 class Directory(IceDrive.Directory):
