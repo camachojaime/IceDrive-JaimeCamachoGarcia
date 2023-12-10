@@ -169,29 +169,29 @@ class DirectoryService(IceDrive.DirectoryService):
         return IceDrive.DirectoryPrx.uncheckedCast(proxy)
 
 
-class Server(Ice.Application):
-    '''Server class'''
-    def run(self, argv):
-        '''Run method'''
+# class Server(Ice.Application):
+#     '''Server class'''
+#     def run(self, argv):
+#         '''Run method'''
 
-        print(TXPURPLE + "[DIRECTORY] Launching directory..." + TXENDC)
+#         print(TXPURPLE + "[DIRECTORY] Launching directory..." + TXENDC)
 
-        broker = self.communicator()
-        servant = DirectoryService()
+#         broker = self.communicator()
+#         servant = DirectoryService()
 
-        adapter = broker.createObjectAdapter("DirectoryServiceAdapter")
-        proxy = adapter.add(servant, broker.stringToIdentity("DirectoryService1"))
+#         adapter = broker.createObjectAdapter("DirectoryServiceAdapter")
+#         proxy = adapter.add(servant, broker.stringToIdentity("DirectoryService1"))
 
-        print(proxy)
+#         print(proxy)
 
-        adapter.activate()
-        self.shutdownOnInterrupt()
-        broker.waitForShutdown()
+#         adapter.activate()
+#         self.shutdownOnInterrupt()
+#         broker.waitForShutdown()
 
-        sys.stdout.flush()
+#         sys.stdout.flush()
 
 
-server = Server()
-sys.exit(server.main(sys.argv))
+# server = Server()
+# sys.exit(server.main(sys.argv))
 
 
