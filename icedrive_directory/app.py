@@ -3,12 +3,13 @@
 import logging
 import sys
 from typing import List
-import time
+import time, threading
 
 import Ice
 import IceStorm
 
 import IceDrive
+from discovery import Discovery
 
 from .directory import DirectoryService
 
@@ -18,6 +19,8 @@ class DirectoryApp(Ice.Application):
 
     def run(self, args: List[str]) -> int:
         """Execute the code for the AuthentacionApp class."""
+
+
 
         # SetUP IceStorm
         properties = self.communicator().getProperties()
@@ -36,11 +39,7 @@ class DirectoryApp(Ice.Application):
 
         # DiscoveryPub
         discovery_pub = IceDrive.DiscoveryPrx.uncheckedCast(topic.getPublisher())
-        
-
-
-
-
+        threading.Thread(target=self.sendAnnoucement, args=(discovery_pub, servant_proxy), daemon=True).start()
 
 
 
@@ -49,14 +48,19 @@ class DirectoryApp(Ice.Application):
 
         servant = DirectoryService()
         servant_proxy = adapter.addWithUUID(servant)
+        directoryPrx = IceDrive.DirectoryPrx.uncheckedCast(servant_proxy)
 
-        self.sendAnnouncet(discovery_pub, servant_proxy)        ## unche
+        servantDis = Discovery()
+        servantDis_proxy = adapter.addWithUUID(servantDis)
+        discoveryPrx = IceDrive.DiscoveryPrx.uncheckedCast(servantDis_proxy)    ######
+
+        self.sendAnnounces(discovery_pub, directoryPrx)
 
 
-        #
-        topic.subscribeAndGetPublisher({}, )
+        ###
+        topic.subscribeAndGetPublisher({}, discoveryPrx)
 
-        logging.info("Proxy: %s", servant_proxy)
+        logging.info("Proxy: %s", directoryPrx)
 
         self.shutdownOnInterrupt()
         self.communicator().waitForShutdown()
@@ -64,11 +68,12 @@ class DirectoryApp(Ice.Application):
         return 0
 
 
-    def sendAnnouncet(self, publisher, servicePrx):
-        publisher.announceDirectoryServicey(servicePrx)   #############################################   Cada 5 segundos
-        print("5 segundos")
-        time.sleep(5)
-        self.sendAnnouncet(publisher, servicePrx)
+    def sendAnnounces(self, publisher, servicePrx):
+        
+        while True:
+            publisher.announceDirectoryServicey(servicePrx)
+            print(servicePrx)
+            time.sleep(5)
         
 
 
