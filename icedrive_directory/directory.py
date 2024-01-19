@@ -30,6 +30,7 @@ class Directory(IceDrive.Directory):
         self.user = user
 
 
+
     def getPath(self, current: Ice.Current = None) -> str:
         """Return the path for the directory within the user space."""
 
