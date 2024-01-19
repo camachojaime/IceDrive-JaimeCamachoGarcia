@@ -3,6 +3,7 @@
 import logging
 import sys
 from typing import List
+import time
 
 import Ice
 import IceStorm
@@ -17,8 +18,6 @@ class DirectoryApp(Ice.Application):
 
     def run(self, args: List[str]) -> int:
         """Execute the code for the AuthentacionApp class."""
-
-        print("")
 
         # SetUP IceStorm
         properties = self.communicator().getProperties()
@@ -37,7 +36,7 @@ class DirectoryApp(Ice.Application):
 
         # DiscoveryPub
         discovery_pub = IceDrive.DiscoveryPrx.uncheckedCast(topic.getPublisher())
-        discovery_pub.announceDirectoryServicey()   #############################################   Cada 5 segundos
+        
 
 
 
@@ -51,6 +50,8 @@ class DirectoryApp(Ice.Application):
         servant = DirectoryService()
         servant_proxy = adapter.addWithUUID(servant)
 
+        self.sendAnnouncet(discovery_pub, servant_proxy)        ## unche
+
 
         #
         topic.subscribeAndGetPublisher({}, )
@@ -61,6 +62,14 @@ class DirectoryApp(Ice.Application):
         self.communicator().waitForShutdown()
 
         return 0
+
+
+    def sendAnnouncet(self, publisher, servicePrx):
+        publisher.announceDirectoryServicey(servicePrx)   #############################################   Cada 5 segundos
+        print("5 segundos")
+        time.sleep(5)
+        self.sendAnnouncet(publisher, servicePrx)
+        
 
 
 def main():
