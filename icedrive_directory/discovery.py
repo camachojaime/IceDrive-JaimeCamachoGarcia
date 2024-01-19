@@ -9,10 +9,13 @@ import IceDrive
 class Discovery(IceDrive.Discovery):
     """Servants class for service discovery."""
 
+
     def __init__(self):
         conjunto_authentication = set()
         conjunto_directoryService = set()
         conjunto_blobService = set()
+
+
 
 
     def announceAuthentication(self, prx: IceDrive.AuthenticationPrx, current: Ice.Current = None) -> None:
@@ -22,8 +25,21 @@ class Discovery(IceDrive.Discovery):
 
         self.conjunto_authentication.add(prx)
 
-    def getAuthentication(self):
-        return self.conjunto_authentication.pop()
+    def getAuthenticationPrx(self ,current: Ice.Current = None) -> IceDrive.AuthenticationPrx:
+
+        while len(self.conjunto_authentication) != 0:
+            prx = self.conjunto_authentication.pop()
+            self.conjunto_authentication.add(prx)
+
+            try:
+                prx.ice_ping()
+                return prx
+            
+            except Ice.Exception:
+                self.conjunto_authentication.remove(prx)
+        
+        return None
+
 
 
 
@@ -34,8 +50,21 @@ class Discovery(IceDrive.Discovery):
 
         self.conjunto_directoryService.add(prx)
 
-    def getDirectoryService(self):
-        return self.conjunto_directoryService.pop()
+    def getDirectoryServicePrx(self ,current: Ice.Current = None) -> IceDrive.AuthenticationPrx:
+
+        while len(self.conjunto_directoryService) != 0:
+            prx = self.conjunto_directoryService.pop()
+            self.conjunto_directoryService.add(prx)
+
+            try:
+                prx.ice_ping()
+                return prx
+            
+            except Ice.Exception:
+                self.conjunto_directoryService.remove(prx)
+        
+        return None
+
 
 
 
@@ -46,5 +75,17 @@ class Discovery(IceDrive.Discovery):
 
         self.conjunto_blobService.add(prx)
 
-    def getBlobService(self):
-        return self.conjunto_blobService.pop()
+    def getAuthenticationPrx(self ,current: Ice.Current = None) -> IceDrive.AuthenticationPrx:
+
+        while len(self.conjunto_blobService) != 0:
+            prx = self.conjunto_blobService.pop()
+            self.conjunto_blobService.add(prx)
+
+            try:
+                prx.ice_ping()
+                return prx
+            
+            except Ice.Exception:
+                self.conjunto_blobService.remove(prx)
+        
+        return None

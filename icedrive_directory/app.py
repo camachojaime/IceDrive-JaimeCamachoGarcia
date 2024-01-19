@@ -36,25 +36,23 @@ class DirectoryApp(Ice.Application):
             topic = topic_manager.create(topic_name)
 
 
+        servant = DirectoryService()
+        servant_proxy = adapter.addWithUUID(servant)
+        directoryPrx = IceDrive.DirectoryPrx.uncheckedCast(servant_proxy)
+
 
         # DiscoveryPub
         discovery_pub = IceDrive.DiscoveryPrx.uncheckedCast(topic.getPublisher())
-        threading.Thread(target=self.sendAnnoucement, args=(discovery_pub, servant_proxy), daemon=True).start()
-
+        threading.Thread(target=self.sendAnnoucement, args=(discovery_pub, directoryPrx), daemon=True).start()
 
 
         adapter = self.communicator().createObjectAdapter("DirectoryAdapter")
         adapter.activate()
 
-        servant = DirectoryService()
-        servant_proxy = adapter.addWithUUID(servant)
-        directoryPrx = IceDrive.DirectoryPrx.uncheckedCast(servant_proxy)
 
         servantDis = Discovery()
         servantDis_proxy = adapter.addWithUUID(servantDis)
         discoveryPrx = IceDrive.DiscoveryPrx.uncheckedCast(servantDis_proxy)    ######
-
-        self.sendAnnounces(discovery_pub, directoryPrx)
 
 
         ###
@@ -68,7 +66,7 @@ class DirectoryApp(Ice.Application):
         return 0
 
 
-    def sendAnnounces(self, publisher, servicePrx):
+    def sendAnnoucement(self, publisher, servicePrx):
         
         while True:
             publisher.announceDirectoryServicey(servicePrx)
