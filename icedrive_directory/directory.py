@@ -47,11 +47,11 @@ class Directory(IceDrive.Directory):
 
                 proxy = current.adapter.addWithUUID(self)
                 return IceDrive.DirectoryPrx.uncheckedCast(proxy)
-            
+
             raise IceDrive.RootHasNoParent()
 
         print(TXRED + "User not is alive" + TXENDC)
-    
+
 
 
     def getChilds(self, current: Ice.Current = None) -> List[str]:
@@ -59,7 +59,7 @@ class Directory(IceDrive.Directory):
 
         if self.user.isAlive():
             directorys = os.path.join(os.getcwd(), "usersDirectorys", self.route)
-            
+
             # self.childs = []
             # for dir in os.listdir(directorys):
             #     if os.path.isdir(os.path.join(directorys, dir)):
@@ -83,12 +83,12 @@ class Directory(IceDrive.Directory):
 
                 proxy = current.adapter.addWithUUID(self)
                 return IceDrive.DirectoryPrx.uncheckedCast(proxy)
-            
+
             #except:
             raise IceDrive.ChildNotExists( name, route)
-        
+
         print(TXRED + "User not is alive" + TXENDC)
-        
+
 
 
     def createChild(
@@ -98,7 +98,7 @@ class Directory(IceDrive.Directory):
 
         if self.user.isAlive():
             route = os.path.join(os.getcwd(), "usersDirectorys", self.route, name)
-            
+
             if name not in self.getChilds():
                 route = os.path.join(os.getcwd(), "usersDirectorys", self.route, name)
                 os.makedirs(route)
@@ -107,7 +107,7 @@ class Directory(IceDrive.Directory):
                 return IceDrive.DirectoryPrx.uncheckedCast(proxy)
 
             raise IceDrive.ChildAlreadyExists( name, route)
-        
+
         print(TXRED + "User not is alive" + TXENDC)
 
 
@@ -118,7 +118,7 @@ class Directory(IceDrive.Directory):
         if self.user.isAlive():
             if name in self.getChilds():
                 os.rmdir(os.path.join(os.getcwd(), "usersDirectorys", self.route, name))
-        
+
         print(TXRED + "User not is alive" + TXENDC)
 
 
@@ -128,14 +128,14 @@ class Directory(IceDrive.Directory):
 
         if self.user.isAlive():
             directorys = os.path.join(os.getcwd(), "usersDirectorys", self.route)
-            
+
             files = []
             for f in os.listdir(directorys):
                 if not os.path.isdir(os.path.join(directorys, f)):
                     files.append(f)
-            
+
             return files
-        
+
         print(TXRED + "User not is alive" + TXENDC)
 
 
@@ -146,10 +146,10 @@ class Directory(IceDrive.Directory):
         if self.user.isAlive():
             if filename in self.getFiles():
                 with open(os.path.join(os.getcwd(), "usersDirectorys", self.route, filename), 'r') as file:
-                    return(file.read())
-            
+                    return file.read()
+
             raise IceDrive.FileNotFound(filename)
-        
+
         print(TXRED + "User not is alive" + TXENDC)
 
 
@@ -167,11 +167,11 @@ class Directory(IceDrive.Directory):
                 if filename not in self.getFiles():
                     with open(os.path.join(os.getcwd(), "usersDirectorys", self.route, filename), 'w') as file:
                         file.write(blob_id)
-            
+
                 raise IceDrive.FileAlreadyExists(filename)
-            
+
             raise IceDrive.TemporaryUnavailable("BlobService")
-        
+
         print(TXRED + "User not is alive" + TXENDC)
 
 
@@ -188,9 +188,9 @@ class Directory(IceDrive.Directory):
                     blob_service.Unlink(blob_id)
 
                 os.remove(os.path.join(os.getcwd(), "usersDirectorys", self.route, filename))
-            
+
             raise IceDrive.FileNotFound(filename)
-        
+
         print(TXRED + "User not is alive" + TXENDC)
 
 
@@ -212,16 +212,16 @@ class DirectoryService(IceDrive.DirectoryService):
 
         print(TXYELLOW + "Buscando usuario..." + TXENDC)
         userName = user.getUsername()
-        
+
         usersDirectorys = os.path.join(os.getcwd(), 'usersDirectorys')
-        
+
         directory = Directory(self.discovery, user)
         directory.route += userName
-        
+
         if auth.verifyUser(user):
 
             if userName in os.listdir(usersDirectorys) and os.path.isdir(os.path.join(usersDirectorys, userName)):
-                print(TXPURPLE + "Usuario encontrado!!!" + TXENDC)                  
+                print(TXPURPLE + "Usuario encontrado!!!" + TXENDC)
 
                 proxy = current.adapter.addWithUUID(directory)
                 return IceDrive.DirectoryPrx.uncheckedCast(proxy)
@@ -231,7 +231,7 @@ class DirectoryService(IceDrive.DirectoryService):
 
             proxy = current.adapter.addWithUUID(directory)
             return IceDrive.DirectoryPrx.uncheckedCast(proxy)
-        
+
 
         raise IceDrive.TemporaryUnavailable("Authentication")
 
