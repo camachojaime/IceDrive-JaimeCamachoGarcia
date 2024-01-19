@@ -35,8 +35,13 @@ class DirectoryApp(Ice.Application):
         except:
             topic = topic_manager.create(topic_name)
 
+        
+        servantDis = Discovery()
+        servantDis_proxy = adapter.addWithUUID(servantDis)
+        discoveryPrx = IceDrive.DiscoveryPrx.uncheckedCast(servantDis_proxy)    ######
 
-        servant = DirectoryService()
+
+        servant = DirectoryService(servantDis)
         servant_proxy = adapter.addWithUUID(servant)
         directoryPrx = IceDrive.DirectoryPrx.uncheckedCast(servant_proxy)
 
@@ -48,11 +53,6 @@ class DirectoryApp(Ice.Application):
 
         adapter = self.communicator().createObjectAdapter("DirectoryAdapter")
         adapter.activate()
-
-
-        servantDis = Discovery()
-        servantDis_proxy = adapter.addWithUUID(servantDis)
-        discoveryPrx = IceDrive.DiscoveryPrx.uncheckedCast(servantDis_proxy)    ######
 
 
         ###

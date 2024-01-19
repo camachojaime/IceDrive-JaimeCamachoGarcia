@@ -6,9 +6,13 @@ import Ice
 
 import IceDrive
 
+from discovery import Discovery
+
+
 
 class Directory(IceDrive.Directory):
     """Implementation of the IceDrive.Directory interface."""
+
 
     def getPath(self, current: Ice.Current = None) -> str:
         """Return the path for the directory within the user space."""
@@ -48,5 +52,16 @@ class Directory(IceDrive.Directory):
 class DirectoryService(IceDrive.DirectoryService):
     """Implementation of the IceDrive.Directory interface."""
 
+
+    def __init__(self, discovery):
+        self.discovery = discovery
+
+
     def getRoot(self, user: IceDrive.UserPrx, current: Ice.Current = None) -> IceDrive.DirectoryPrx:
         """Return the proxy for the root directory of the given user."""
+
+        auth = self.discovery.getAuthenticationPrx()
+
+        if auth.verifyUser(user):
+            print()
+
