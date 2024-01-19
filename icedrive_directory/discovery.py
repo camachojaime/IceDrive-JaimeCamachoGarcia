@@ -75,7 +75,7 @@ class Discovery(IceDrive.Discovery):
 
         self.conjunto_blobService.add(prx)
 
-    def getAuthenticationPrx(self ,current: Ice.Current = None) -> IceDrive.AuthenticationPrx:
+    def getBlobService(self ,current: Ice.Current = None) -> IceDrive.AuthenticationPrx:
 
         while len(self.conjunto_blobService) != 0:
             prx = self.conjunto_blobService.pop()
